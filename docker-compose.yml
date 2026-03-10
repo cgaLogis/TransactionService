@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  posgresdb:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: root #TODO: move it
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+volumes:
+  postgres_data:
+networks:
+  my-network:

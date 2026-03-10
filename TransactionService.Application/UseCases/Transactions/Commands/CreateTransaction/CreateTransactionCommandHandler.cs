@@ -19,10 +19,25 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             TransactionDate = request.TransactionDate,
             Amount = request.Amount
         };
-        var item = await _transactionRepository.CreateAsync(entity,cancellationToken);
+
+        var exists = await _transactionRepository.ExistsAsync(x => x.Id == entity.Id,cancellationToken);
+
+        DateTime insertDateTime = DateTime.MinValue;
+
+        if (exists)
+        {
+            var item = await _transactionRepository.GetByIdAsync(entity.Id,cancellationToken);
+            insertDateTime = item.TransactionDate;
+        }else
+        {
+            var item = await _transactionRepository.CreateAsync(entity, cancellationToken);
+            insertDateTime = item.TransactionDate;
+        }
+
         return new CreateTransasctionResponse
         {
-            InsertDateTime = item.TransactionDate
+            InsertDateTime = insertDateTime
         };
+
     }
 }
