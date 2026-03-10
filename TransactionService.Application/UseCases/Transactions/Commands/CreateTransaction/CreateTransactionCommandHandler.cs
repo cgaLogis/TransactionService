@@ -22,8 +22,9 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
         }
 
         var exists = await _transactionRepository.ExistsAsync(x => x.Id == request.Id, cancellationToken);
-        
-        
+
+        if (request.Amount < 0)
+            throw new TransactionAmountLessZeroException(request.Id,request.Amount);
 
         DateTime insertDateTime = DateTime.MinValue;
 
@@ -33,6 +34,8 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
             insertDateTime = item.TransactionDate;
         }else
         {
+
+
             var entity = new Transaction
             {
                 Id = request.Id,
