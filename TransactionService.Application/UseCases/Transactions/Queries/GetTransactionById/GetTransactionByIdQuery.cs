@@ -1,4 +1,5 @@
 using MediatR;
+using TransactionService.Application.Excceptions;
 using TransactionService.Application.Interfaces;
 
 namespace TransactionService.Application.UseCases.Transactions.Queries.GetTransactionById;
@@ -19,7 +20,7 @@ public class GetTransactionByIdQuery : IRequest<GetTransactionByIdResponse>
         {
             var exists = await _transactionRepository.ExistsAsync(x=>x.Id == request.Id,cancellationToken);
             if (!exists)
-                throw new ArgumentNullException("Нет такой транзакции");
+                throw new NotFoundTransactionException(request.Id);
             var item = await _transactionRepository.GetByIdAsync(request.Id,cancellationToken);
             return new GetTransactionByIdResponse(item.Id, item.TransactionDate, item.Amount);
         }
