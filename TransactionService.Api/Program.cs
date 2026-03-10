@@ -29,7 +29,7 @@ public class Program
             app.MapOpenApi();
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/openapi/v1.json", "TransactionService");
+                options.SwaggerEndpoint("openapi/v1.json", "TransactionService");
             });
         }
 
@@ -37,7 +37,7 @@ public class Program
 
         app.UseAuthorization();
         
-        app.MapGet("api/v1/transaction", async ([FromQuery] Guid id,IMediator mediator) => await mediator.Send(new GetTransactionByIdQuery()));
+        app.MapGet("api/v1/transaction", async ([FromQuery] Guid id,IMediator mediator) => await mediator.Send(new GetTransactionByIdQuery() { Id = id}));
 
         app.MapPost("api/v1/transaction", async (IMediator mediator, CreateTransactionCommand command) => await mediator.Send(command));
         
