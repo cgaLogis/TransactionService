@@ -8,6 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Endpoints\**" />
+      <Content Remove="Endpoints\**" />
+      <EmbeddedResource Remove="Endpoints\**" />
+      <None Remove="Endpoints\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.13" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.13">
           <PrivateAssets>all</PrivateAssets>
@@ -24,10 +31,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\TransactionService.Infrastructure\TransactionService.Infrastructure.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Endpoints\" />
     </ItemGroup>
 
 </Project>

@@ -29,7 +29,7 @@ public class Program
             app.MapOpenApi();
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("openapi/v1.json", "TransactionService");
+                options.SwaggerEndpoint("/openapi/v1.json", "TransactionService");
             });
         }
 
