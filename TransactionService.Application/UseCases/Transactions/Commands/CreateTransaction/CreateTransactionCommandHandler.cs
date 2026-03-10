@@ -1,4 +1,5 @@
 using MediatR;
+using TransactionService.Application.Excceptions;
 using TransactionService.Application.Interfaces;
 using TransactionService.Domain.Entities;
 
@@ -13,23 +14,31 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
     }
     public async Task<CreateTransasctionResponse> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
     {
-        var entity = new Transaction
+        var transactionsCount = await _transactionRepository.GetTransactionsCountAsync(cancellationToken);
+        
+        if (transactionsCount > 100)
         {
-            Id = request.Id,
-            TransactionDate = request.TransactionDate,
-            Amount = request.Amount
-        };
+            throw new TransactionsMaxCountException();
+        }
 
-        var exists = await _transactionRepository.ExistsAsync(x => x.Id == entity.Id,cancellationToken);
+        var exists = await _transactionRepository.ExistsAsync(x => x.Id == request.Id, cancellationToken);
+        
+        
 
         DateTime insertDateTime = DateTime.MinValue;
 
         if (exists)
         {
-            var item = await _transactionRepository.GetByIdAsync(entity.Id,cancellationToken);
+            var item = await _transactionRepository.GetByIdAsync(request.Id,cancellationToken);
             insertDateTime = item.TransactionDate;
         }else
         {
+            var entity = new Transaction
+            {
+                Id = request.Id,
+                TransactionDate = request.TransactionDate,
+                Amount = request.Amount
+            };
             var item = await _transactionRepository.CreateAsync(entity, cancellationToken);
             insertDateTime = item.TransactionDate;
         }

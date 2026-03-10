@@ -8,4 +8,5 @@ public interface ITransactionRepository
     Task<Transaction> GetByIdAsync(Guid id,CancellationToken ct);
     Task<Transaction> CreateAsync(Transaction entity,CancellationToken ct);
     Task<bool> ExistsAsync(Expression<Func<Transaction, bool>> where, CancellationToken ct);
+    Task<int> GetTransactionsCountAsync(CancellationToken ct);
 }

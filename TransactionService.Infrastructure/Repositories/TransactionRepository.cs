@@ -30,4 +30,9 @@ public class TransactionRepository : ITransactionRepository
         await _context.SaveChangesAsync();
         return entity;
     }
+
+    public  async Task<int> GetTransactionsCountAsync(CancellationToken ct)
+    {
+        return await _context.Transactions.AsNoTracking().CountAsync(ct);
+    }
 }
