@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.RateLimiting;
 using TransactionService.Application;
 using TransactionService.Application.UseCases.Transactions.Commands.CreateTransaction;
 using TransactionService.Application.UseCases.Transactions.Queries.GetTransactionById;
@@ -20,7 +21,32 @@ public class Program
         builder.Services.AddOpenApi();
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
-        
+        builder.Services.AddRateLimiter(opts =>
+        {
+            opts.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            opts.OnRejected = async (context, token) =>
+            {
+                await context.HttpContext.Response.WriteAsync("Too many queries.Wait please.", cancellationToken: token);
+            };
+
+            opts.AddPolicy("TokenBucketPolicy", httpContext => {
+                var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                return RateLimitPartition.GetTokenBucketLimiter(
+                    partitionKey: ipAddress,
+                    factory: _ => new TokenBucketRateLimiterOptions
+                    {
+                        TokenLimit = 5,
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                        QueueLimit = 0,
+                        ReplenishmentPeriod = TimeSpan.FromSeconds(5),
+                        TokensPerPeriod = 1,
+                        AutoReplenishment = true
+                    }
+                    );
+            });
+        });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -34,12 +60,13 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-
+        app.UseRateLimiter();
         app.UseAuthorization();
         
-        app.MapGet("api/v1/transaction", async ([FromQuery] Guid id,IMediator mediator) => await mediator.Send(new GetTransactionByIdQuery() { Id = id}));
+        app.MapGet("api/v1/transactions/{id}", async (Guid id,IMediator mediator) => await mediator.Send(new GetTransactionByIdQuery() { Id = id}))
+            .RequireRateLimiting("TokenBucketPolicy");
 
-        app.MapPost("api/v1/transaction", async (IMediator mediator, CreateTransactionCommand command) => await mediator.Send(command));
+        app.MapPost("api/v1/transactions", async ( CreateTransactionCommand command, IMediator mediator) => await mediator.Send(command));
         
         app.Run();
     }
