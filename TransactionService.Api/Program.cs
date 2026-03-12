@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using System.Threading.RateLimiting;
 using TransactionService.Application;
 using TransactionService.Application.UseCases.Transactions.Commands.CreateTransaction;
