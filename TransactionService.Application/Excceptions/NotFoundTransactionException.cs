@@ -8,7 +8,7 @@ namespace TransactionService.Application.Excceptions
 {
     public class NotFoundTransactionException : ApplicationException
     {
-        public NotFoundTransactionException(Guid id): base($"Transaction with id: {id} not found")
+        public NotFoundTransactionException(Guid id) : base($"Transaction with id: {id} not found")
         {
         }
     }

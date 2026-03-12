@@ -29,7 +29,8 @@ public class Program
                 await context.HttpContext.Response.WriteAsync("Too many queries.Wait please.", cancellationToken: token);
             };
 
-            opts.AddPolicy("TokenBucketPolicy", httpContext => {
+            opts.AddPolicy("TokenBucketPolicy", httpContext =>
+            {
                 var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
                 return RateLimitPartition.GetTokenBucketLimiter(
@@ -62,12 +63,12 @@ public class Program
         app.UseHttpsRedirection();
         app.UseRateLimiter();
         app.UseAuthorization();
-        
-        app.MapGet("api/v1/transactions/{id}", async (Guid id,IMediator mediator) => await mediator.Send(new GetTransactionByIdQuery() { Id = id}))
+
+        app.MapGet("api/v1/transactions/{id}", async (Guid id, IMediator mediator) => await mediator.Send(new GetTransactionByIdQuery() { Id = id }))
             .RequireRateLimiting("TokenBucketPolicy");
 
-        app.MapPost("api/v1/transactions", async ( CreateTransactionCommand command, IMediator mediator) => await mediator.Send(command));
-        
+        app.MapPost("api/v1/transactions", async (CreateTransactionCommand command, IMediator mediator) => await mediator.Send(command));
+
         app.Run();
     }
 }

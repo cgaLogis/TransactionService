@@ -18,10 +18,10 @@ public class GetTransactionByIdQuery : IRequest<GetTransactionByIdResponse>
         }
         public async Task<GetTransactionByIdResponse> Handle(GetTransactionByIdQuery request, CancellationToken cancellationToken)
         {
-            var exists = await _transactionRepository.ExistsAsync(x=>x.Id == request.Id,cancellationToken);
+            var exists = await _transactionRepository.ExistsAsync(x => x.Id == request.Id, cancellationToken);
             if (!exists)
                 throw new NotFoundTransactionException(request.Id);
-            var item = await _transactionRepository.GetByIdAsync(request.Id,cancellationToken);
+            var item = await _transactionRepository.GetByIdAsync(request.Id, cancellationToken);
             return new GetTransactionByIdResponse(item.Id, item.TransactionDate, item.Amount);
         }
     }

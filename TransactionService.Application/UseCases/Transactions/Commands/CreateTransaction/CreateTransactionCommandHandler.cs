@@ -5,7 +5,7 @@ using TransactionService.Domain.Entities;
 
 namespace TransactionService.Application.UseCases.Transactions.Commands.CreateTransaction;
 
-public class CreateTransactionCommandHandler : IRequestHandler<CreateTransactionCommand,CreateTransasctionResponse>
+public class CreateTransactionCommandHandler : IRequestHandler<CreateTransactionCommand, CreateTransasctionResponse>
 {
     private readonly ITransactionRepository _transactionRepository;
     public CreateTransactionCommandHandler(ITransactionRepository transactionRepository)
@@ -15,7 +15,7 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
     public async Task<CreateTransasctionResponse> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
     {
         var transactionsCount = await _transactionRepository.GetTransactionsCountAsync(cancellationToken);
-        
+
         if (transactionsCount > 100)
         {
             throw new TransactionsMaxCountException();
@@ -24,15 +24,16 @@ public class CreateTransactionCommandHandler : IRequestHandler<CreateTransaction
         var exists = await _transactionRepository.ExistsAsync(x => x.Id == request.Id, cancellationToken);
 
         if (request.Amount < 0)
-            throw new TransactionAmountLessZeroException(request.Id,request.Amount);
+            throw new TransactionAmountLessZeroException(request.Id, request.Amount);
 
         DateTime insertDateTime = DateTime.MinValue;
 
         if (exists)
         {
-            var item = await _transactionRepository.GetByIdAsync(request.Id,cancellationToken);
+            var item = await _transactionRepository.GetByIdAsync(request.Id, cancellationToken);
             insertDateTime = item.TransactionDate;
-        }else
+        }
+        else
         {
 
 

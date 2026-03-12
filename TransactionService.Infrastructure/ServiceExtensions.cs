@@ -15,7 +15,7 @@ public static class ServiceExtensions
             options.UseNpgsql(
                 configuration.GetConnectionString("TransactionDbConnString"),
                 b => b.MigrationsAssembly(typeof(TransactionDbContext).Assembly.FullName)));
-        
+
         services.AddTransient<ITransactionRepository, TransactionRepository>();
     }
 }
